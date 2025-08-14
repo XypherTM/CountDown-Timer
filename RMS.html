@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Countdown Timer</title>
+<link rel="stylesheet" href="RMStyle.css">
+</head>
+<body>
+<div class="container">
+    <h1 id="timer">15:00</h1>
+    <p id="totalTime">Total Time: 0:00</p>
+    <div class="buttons">
+        <button onclick="addMinutes(3)">+ 3 Minutes</button>
+        <button onclick="pauseTimer()" id="pauseBtn">Pause</button>
+        <button onclick="restartTimer()">Restart</button>
+        <button onclick="skipMinute()">Skip</button>
+    </div>
+</div>
+
+<script>
+let originalMaxTime = 15 * 60; // store the original limit in seconds
+let maxTime = originalMaxTime; // current max limit
+let timeLeft = maxTime;
+let totalTime = 0; // total time counter in seconds
+
+let timerDisplay = document.getElementById("timer");
+let totalTimeDisplay = document.getElementById("totalTime");
+let timerInterval = null;
+let isPaused = false;
+
+function updateDisplay() {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function updateTotalTimeDisplay() {
+    let minutes = Math.floor(totalTime / 60);
+    let seconds = totalTime % 60;
+    totalTimeDisplay.textContent = `Total Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function countdown() {
+    if (!isPaused) {
+        if (timeLeft > 0) {
+            timeLeft--;
+        }
+        totalTime++; // always increase total time unless paused
+        updateDisplay();
+        updateTotalTimeDisplay();
+    }
+}
+
+function startTimer() {
+    if (!timerInterval) {
+        timerInterval = setInterval(countdown, 1000);
+    }
+}
+
+function pauseTimer() {
+    isPaused = !isPaused;
+    document.getElementById("pauseBtn").textContent = isPaused ? "Resume" : "Pause";
+}
+
+function restartTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    maxTime = originalMaxTime; // restore original 15 min
+    timeLeft = maxTime;
+    totalTime = 0; // reset total time
+    isPaused = false;
+    document.getElementById("pauseBtn").textContent = "Pause";
+    updateDisplay();
+    updateTotalTimeDisplay();
+    startTimer();
+}
+
+function addMinutes(minutes) {
+    timeLeft += minutes * 60;
+    if (timeLeft > maxTime) {
+        timeLeft = maxTime;
+    }
+    updateDisplay();
+}
+
+function skipMinute() {
+    if (maxTime > 60) { // don't go below 1 min
+        maxTime -= 60;
+        if (timeLeft > maxTime) {
+            timeLeft = maxTime;
+        }
+        updateDisplay();
+    }
+}
+
+// Initial setup
+updateDisplay();
+updateTotalTimeDisplay();
+startTimer();
+</script>
+</body>
+</html>
